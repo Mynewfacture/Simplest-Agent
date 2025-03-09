@@ -1,5 +1,21 @@
-import os
-import sys
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Agent Configuration Editor GUI
+
+This module provides a graphical user interface for editing and visualizing
+agent configuration files in TOML format. It allows users to modify state machine
+configurations including state transitions, prompts, temperatures, and models.
+
+Features:
+- Edit configuration parameters through an intuitive interface
+- Visualize the state machine as a directed graph
+- Add, edit, and delete states
+- Configure transitions between states
+- Save and reload configurations
+"""
+
+import os, sys
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import matplotlib.pyplot as plt
@@ -15,7 +31,26 @@ except ImportError:
     import tomli_w as tomli_write  # For writing TOML
 
 class ConfigEditorApp:
+    """
+    Main application class for the Agent Configuration Editor GUI.
+    
+    This class handles the creation of the UI, loading/saving of configuration files,
+    and all user interactions for editing the agent configuration.
+    
+    Attributes:
+        root (tk.Tk): The main Tkinter window
+        config_path (str): Path to the TOML configuration file
+        config_data (dict): Loaded configuration data
+        notebook (ttk.Notebook): Main tab container
+    """
     def __init__(self, root, config_path):
+        """
+        Initialize the ConfigEditorApp with the specified root window and config path.
+        
+        Args:
+            root (tk.Tk): The main Tkinter window
+            config_path (str): Path to the TOML configuration file
+        """
         self.root = root
         self.root.title("Agent Config Editor")
         self.root.geometry("1200x800")
@@ -44,6 +79,12 @@ class ConfigEditorApp:
         self.load_config()
         
     def setup_editor_interface(self):
+        """
+        Initialize the editor interface with tree navigation and editing panels.
+        
+        This method creates the left navigation panel with a treeview and the
+        right panel for editing configuration properties.
+        """
         # Create main frame
         self.main_frame = ttk.Frame(self.editor_frame)
         self.main_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
@@ -76,6 +117,12 @@ class ConfigEditorApp:
         self.add_state_btn.pack(side=tk.LEFT, padx=5)
     
     def setup_graph_interface(self):
+        """
+        Initialize the graph visualization interface.
+        
+        This method creates the controls for the graph visualization and 
+        the container for the NetworkX graph rendering.
+        """
         # Create controls frame at the top
         self.graph_controls = ttk.Frame(self.graph_frame)
         self.graph_controls.pack(fill=tk.X, padx=10, pady=10)
@@ -100,6 +147,14 @@ class ConfigEditorApp:
         self.canvas = None
         
     def load_config(self):
+        """
+        Load the TOML configuration file from disk.
+        
+        This method reads the configuration file, parses it as TOML,
+        populates the navigation tree, and updates the graph visualization.
+        
+        Displays success or error messages to the user.
+        """
         try:
             with open(self.config_path, "rb") as f:
                 self.config_data = tomllib.load(f)
@@ -110,6 +165,13 @@ class ConfigEditorApp:
             messagebox.showerror("Error", f"Failed to load configuration: {str(e)}")
     
     def populate_tree(self):
+        """
+        Populate the navigation tree with configuration data.
+        
+        This method clears the existing tree and rebuilds it based on the
+        current configuration data, including root items, description fields,
+        states, and their properties.
+        """
         # Clear existing tree
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -140,6 +202,14 @@ class ConfigEditorApp:
         self.tree.item(root_id, open=True)
     
     def update_graph(self):
+        """
+        Update the state machine visualization graph.
+        
+        This method creates or refreshes the NetworkX directed graph based on
+        the current configuration data, applying the selected layout algorithm.
+        The graph shows states as nodes and transitions as edges, with special
+        highlighting for the initial state.
+        """
         if not self.config_data or 'states' not in self.config_data:
             return
         
@@ -225,6 +295,15 @@ class ConfigEditorApp:
         self.canvas = canvas
     
     def on_tree_select(self, event):
+        """
+        Handle tree item selection events.
+        
+        This method clears the right panel and shows the appropriate editor
+        based on the selected tree item.
+        
+        Args:
+            event: The Tkinter event object (can be None when called programmatically)
+        """
         # Clear right panel
         for widget in self.right_panel.winfo_children():
             widget.destroy()
@@ -255,6 +334,12 @@ class ConfigEditorApp:
                 self.show_state_field_editor(values[1], values[2])
     
     def show_root_editor(self):
+        """
+        Display the root configuration overview editor.
+        
+        This method shows a summary of the configuration file, including
+        the path, initial state, and a list of available states.
+        """
         frame = ttk.LabelFrame(self.right_panel, text="Configuration Overview")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -272,6 +357,12 @@ class ConfigEditorApp:
         info_label.pack(fill=tk.BOTH, expand=True)
     
     def show_initial_state_editor(self):
+        """
+        Display the initial state editor.
+        
+        This method creates a dropdown for selecting the initial state
+        from the available states in the configuration.
+        """
         frame = ttk.LabelFrame(self.right_panel, text="Initial State")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -290,6 +381,15 @@ class ConfigEditorApp:
         save_btn.pack(pady=10)
     
     def update_initial_state(self, new_state):
+        """
+        Update the initial state in the configuration.
+        
+        Args:
+            new_state (str): The name of the new initial state
+            
+        Validates that the state exists before updating and shows
+        appropriate success or error messages.
+        """
         if not new_state or new_state not in self.config_data.get('states', {}):
             messagebox.showerror("Error", f"Invalid state: {new_state}")
             return
@@ -300,6 +400,12 @@ class ConfigEditorApp:
         messagebox.showinfo("Success", f"Initial state updated to {new_state}")
     
     def show_description_editor(self):
+        """
+        Display the description editor.
+        
+        This method creates text widgets for each description field
+        in the configuration, allowing the user to edit them.
+        """
         frame = ttk.LabelFrame(self.right_panel, text="Description")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -317,6 +423,14 @@ class ConfigEditorApp:
             update_btn.pack(pady=5)
     
     def show_description_field_editor(self, field):
+        """
+        Display the editor for a specific description field.
+        
+        Args:
+            field (str): The name of the description field to edit
+            
+        Creates a text widget for editing the specified description field.
+        """
         frame = ttk.LabelFrame(self.right_panel, text=f"Description - {field}")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -331,6 +445,15 @@ class ConfigEditorApp:
         save_btn.pack(pady=10)
     
     def update_description_field(self, field, new_text):
+        """
+        Update a description field in the configuration.
+        
+        Args:
+            field (str): The name of the description field to update
+            new_text (str): The new content for the description field
+            
+        Creates the description section if it doesn't exist.
+        """
         if 'description' not in self.config_data:
             self.config_data['description'] = {}
         
@@ -338,6 +461,12 @@ class ConfigEditorApp:
         messagebox.showinfo("Success", f"Description field '{field}' updated")
     
     def show_states_editor(self):
+        """
+        Display the states list editor.
+        
+        This method creates a listbox showing all available states
+        with buttons for adding, deleting, and editing states.
+        """
         frame = ttk.LabelFrame(self.right_panel, text="States")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -372,6 +501,15 @@ class ConfigEditorApp:
         edit_btn.pack(side=tk.LEFT, padx=5)
     
     def show_state_editor(self, state_name):
+        """
+        Display the editor for a specific state.
+        
+        Args:
+            state_name (str): The name of the state to edit
+            
+        Creates a tabbed interface with editors for each state property
+        (prompt, temperature, model, transitions).
+        """
         frame = ttk.LabelFrame(self.right_panel, text=f"State: {state_name}")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -461,6 +599,15 @@ class ConfigEditorApp:
         trans_btn.pack(pady=10)
     
     def show_state_field_editor(self, state_name, field_name):
+        """
+        Display the editor for a specific state field.
+        
+        Args:
+            state_name (str): The name of the state
+            field_name (str): The name of the field to edit
+            
+        Creates an appropriate editor widget based on the field type.
+        """
         frame = ttk.LabelFrame(self.right_panel, text=f"State: {state_name} - {field_name}")
         frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
@@ -543,6 +690,17 @@ class ConfigEditorApp:
             save_btn.pack(pady=20)
     
     def update_state_field(self, state_name, field_name, new_value):
+        """
+        Update a state field in the configuration.
+        
+        Args:
+            state_name (str): The name of the state
+            field_name (str): The name of the field to update
+            new_value: The new value for the field
+            
+        Handles special processing for prompt fields and updates the graph
+        if transitions were modified.
+        """
         if field_name == 'prompt':
             new_value = new_value.strip()
         
@@ -554,6 +712,15 @@ class ConfigEditorApp:
             self.update_graph()
     
     def update_transitions(self, state_name, trans_vars):
+        """
+        Update the transitions for a state based on checkbox selections.
+        
+        Args:
+            state_name (str): The name of the state
+            trans_vars (dict): Dictionary mapping state names to BooleanVar objects
+            
+        Collects all selected transitions and updates the state configuration.
+        """
         # Get all selected states
         transitions = [state for state, var in trans_vars.items() if var.get()]
         self.config_data['states'][state_name]['transitions'] = transitions
@@ -561,6 +728,12 @@ class ConfigEditorApp:
         self.update_graph()  # Refresh the graph with new transitions
     
     def add_state(self):
+        """
+        Display a dialog for adding a new state.
+        
+        Creates a dialog with fields for the state name and an optional
+        template state to clone settings from.
+        """
         # Create a dialog to add a new state
         dialog = tk.Toplevel(self.root)
         dialog.title("Add New State")
@@ -583,6 +756,11 @@ class ConfigEditorApp:
         template_dropdown.current(0)
         
         def on_add():
+            """
+            Handle the "Add" button click in the add state dialog.
+            
+            Validates input, creates the new state, and updates the UI.
+            """
             state_name = name_var.get().strip()
             if not state_name:
                 messagebox.showerror("Error", "State name cannot be empty")
@@ -613,6 +791,15 @@ class ConfigEditorApp:
         ttk.Button(dialog, text="Add", command=on_add).pack(pady=20)
     
     def delete_state(self, state_name):
+        """
+        Delete a state from the configuration.
+        
+        Args:
+            state_name (str): The name of the state to delete
+            
+        Validates that the state exists and is not the initial state,
+        then removes it and updates any transitions that referenced it.
+        """
         if not state_name:
             messagebox.showerror("Error", "No state selected")
             return
@@ -644,6 +831,15 @@ class ConfigEditorApp:
         messagebox.showinfo("Success", f"Deleted state: {state_name}")
     
     def edit_state(self, state_name):
+        """
+        Navigate to the editor for a specific state.
+        
+        Args:
+            state_name (str): The name of the state to edit
+            
+        Finds the state in the navigation tree and selects it to show
+        the state editor.
+        """
         if not state_name:
             messagebox.showerror("Error", "No state selected")
             return
@@ -663,6 +859,12 @@ class ConfigEditorApp:
                         return
     
     def save_config(self):
+        """
+        Save the configuration to the TOML file.
+        
+        Writes the current configuration data to the specified file path
+        and displays a success or error message.
+        """
         try:
             # Convert to TOML and save
             with open(self.config_path, "wb") as f:
@@ -672,6 +874,13 @@ class ConfigEditorApp:
             messagebox.showerror("Error", f"Failed to save configuration: {str(e)}")
 
 def main():
+    """
+    Main entry point for the application.
+    
+    Parses command line arguments for the configuration file path,
+    falls back to a default if not provided, and initializes the
+    application UI.
+    """
     if len(sys.argv) > 1:
         config_path = sys.argv[1]
     else:

@@ -37,9 +37,9 @@ This framework was created with simplicity and accessibility as core principles:
 
 - **Built with Python Standard Library**: Most functionality relies on Python's built-in packages, making it lightweight and easy to understand.
 
-- **AI-Friendly Design**: The entire codebase is structured to be easily understood by AI assistants, enabling them to quickly grasp how to use and extend the framework without needing to process extensive documentation.
+- **AI-Friendly Design**: The entire codebase is structured to be easily understood by AI assistants, enabling them to quickly grasp how to use and extend the framework without processing extensive documentation.
 
-- **Easy Debugging**: With a straightforward architecture, errors are easier to identify and fix compared to more complex frameworks with multiple layers of abstraction.
+- **Easy Debugging**: With a straightforward architecture, it is easier to identify and fix errors compared to more complex frameworks with multiple layers of abstraction.
 
 - **Context-Efficient**: The entire framework can be included in an AI's context window, allowing AI assistants to understand the complete system without information loss.
 
@@ -60,10 +60,10 @@ This framework was created with simplicity and accessibility as core principles:
 Install the required dependencies:
 
 ```bash
-pip install openai python-dotenv requests
+pip install openai python-dotenv
 # Choose the appropriate TOML library
 pip install tomli tomli-w  # For Python 3.10 and below
-# For Python 3.11+, tomllib is built-in, but tomli-w is still needed for writing TOML (for using GUI)
+# For Python 3.11+, tomllib is built-in, but tomli-w is still needed for writing TOML
 ```
 
 ### Setup
@@ -123,7 +123,7 @@ The agent's behavior is defined in a TOML configuration file. Here's a breakdown
 
 ```toml
 # Agent configuration
-initial_state = "greeting"  # The state the agent begins in
+initial_state = "greeting"  # The state the agent begins with
 ```
 
 ### General Description
@@ -267,8 +267,8 @@ def calculate_function(params):
 ### Basic Usage
 
 ```python
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from agent import AIAgent
 
 # Load environment variables
@@ -371,7 +371,7 @@ agent.register_action("remember_preference",
 
 ### Implementing Web Search
 
-Using the SearxNG meta-search engine:
+Using the SearXNG meta-search engine:
 
 ```python
 def search_function(params):
@@ -632,8 +632,8 @@ transitions = ["chat", "exit"]
 
 3. Create a Python script to run your agent:
 ```python
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from agent import AIAgent
 
 load_dotenv()

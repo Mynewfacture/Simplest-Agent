@@ -12,9 +12,9 @@ A loop, a state machine, and some external preset functions. That’s the entire
 1. Drop **`agent.py`**, **`agent_config.toml`**, and **`run_agent.py`** into Claude Project knowledge.  
 2. For better results, also upload **`SimplestAgent_documentation.md`** and paste the content in **`Project Instructions.txt`** into Claude's project instructions.  
 3. Go to the chat window and tell Claude what agent you want to build.  
-4. Download the generated Python files, follow the AI’s instructions, and run it—your agent is now up and running.
+4. Download the generated Python files, follow the AI’s instructions, and run it - your agent is now up and running.
 
-We’ve tested this—Claude Project can generate an AI agent with just one sentence. It should also work if you upload the files to Cursor and call Claude, or use Cline/Roo-Cline. 
+We’ve tested this — Claude Project can generate an AI agent with just one sentence. It should also work if you upload the files to Cursor and call Claude, or use Cline/Roo-Cline. 
 
 (However, ChatGPT Canvas won’t work!)
 
